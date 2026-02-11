@@ -3,13 +3,13 @@
 	"id": "manual_enchance",
 	"version": "${version}",
 	"name": "Manual-Enchance",
-	"description": "manual_enchance",
+	"description": "Enhances the manual operation function of MTRmod.",
 	"authors": [
 		"botamochi129"
 	],
 	"contact": {
-		"homepage": "https://github.com/zbx1425/mtr-addon-template",
-		"sources": "https://github.com/zbx1425/mtr-addon-template"
+		"homepage": "https://github.com/botamochi129/Manual-Enchance",
+		"sources": "https://github.com/botamochi129/Manual-Enchance"
 	},
 	"license": "MIT",
 	"icon": "icon.png",

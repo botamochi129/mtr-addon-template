@@ -1,11 +1,12 @@
 import groovy.json.JsonSlurper
 import org.apache.tools.ant.filters.ReplaceTokens
+import java.time.Instant
 
 plugins {
-	id "architectury-plugin" version "3.4-SNAPSHOT"
-	id "dev.architectury.loom" version "1.0-SNAPSHOT" apply false
+	id "architectury-plugin" version "3.4.160"
+	id "dev.architectury.loom" version "1.7.413" apply false
 	id "de.undercouch.download" version "4.1.2"
-	id "com.github.johnrengelman.shadow" version "7.1.0"
+	id "com.github.johnrengelman.shadow" version "8.1.1"
 	id "base"
 }
 
@@ -13,19 +14,24 @@ String default_minecraft_version = "1.16.5"
 String minecraft_version = rootProject.properties.containsKey("buildVersion") ? rootProject.getProperties().get("buildVersion") : default_minecraft_version
 int minecraft_main_version = minecraft_version.split("\\.")[1] as int
 String minecraft_version_int = minecraft_version.split("\\.")[0] +
-    minecraft_version.split("\\.")[1].padLeft(2, '0') +
-    (minecraft_version.split("\\.").length > 2 ? minecraft_version.split("\\.")[2].padLeft(2, '0') : "00")
+		minecraft_version.split("\\.")[1].padLeft(2, '0') +
+		(minecraft_version.split("\\.").length > 2 ? minecraft_version.split("\\.")[2].padLeft(2, '0') : "00")
 boolean is_1_19_3 = minecraft_version == "1.19.3"
-String parchment_version = is_1_19_3 ? "N/A" : new XmlSlurper().parse("https://ldtteam.jfrog.io/artifactory/parchmentmc-internal/org/parchmentmc/data/parchment-${minecraft_version}/maven-metadata.xml").versioning.release
 
-
+// --- 欠落していた変数定義を復活 ---
 rootProject.ext.fabric_loader_version = new JsonSlurper().parse(("https://meta.fabricmc.net/v2/versions/loader/" + minecraft_version).toURL())[0]["loader"]["version"]
 rootProject.ext.forge_version = minecraft_version + "-" + new JsonSlurper().parse(("https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json").toURL())["promos"][minecraft_version + "-latest"]
 rootProject.ext.fabric_api_version = getModrinthVersion("fabric", minecraft_version, "fabric-api")
 rootProject.ext.mod_menu_version = getModrinthVersion("fabric", minecraft_version, "modmenu")
 rootProject.ext.architectury_version = getModrinthVersion("forge", minecraft_version, "architectury-api").split("\\+")[0]
-
 rootProject.ext.architectury_id = minecraft_main_version == 16 ? "me.shedaniel" : "dev.architectury"
+
+String parchment_version = ""
+try {
+	parchment_version = new XmlSlurper().parse("https://ldtteam.jfrog.io/artifactory/parchmentmc-internal/org/parchmentmc/data/parchment-${minecraft_version}/maven-metadata.xml").versioning.release.text()
+} catch (Exception ignored) {
+	parchment_version = ""
+}
 
 architectury {
 	minecraft = minecraft_version
@@ -38,87 +44,75 @@ subprojects {
 		silentMojangMappingsLicense()
 	}
 
+	sourceSets {
+		main {
+			java {
+				srcDirs += "build/generated/sources/mtr-mappings"
+			}
+		}
+	}
+
 	dependencies {
-		annotationProcessor 'systems.manifold:manifold-preprocessor:2022.1.29'
+		annotationProcessor 'systems.manifold:manifold-preprocessor:+'
 		minecraft "com.mojang:minecraft:${minecraft_version}"
-		mappings is_1_19_3 ? loom.officialMojangMappings() : loom.layered() {
+
+		mappings parchment_version == "" ? loom.officialMojangMappings() : loom.layered() {
 			officialMojangMappings()
 			parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
 		}
-		implementation files("../checkouts/mtr-common.jar")
+
+		implementation files("../checkouts/${minecraft_version}/mtr-common.jar")
 	}
 }
 
 task setupLibrary() {
+	String url = "https://aphrodite281.github.io/Minecraft-Transit-Railway-3.x.x/lib/" + minecraft_version + "/"
 	doLast {
-		download {
-			src "https://www.minecrafttransitrailway.com/libs/${rootProject.mtr_version}/MTR-common-${minecraft_version}-${rootProject.mtr_version}-dev.jar"
-			dest "checkouts/mtr-common.jar"
-			overwrite true
-		}
-
-		download {
-			src "https://www.minecrafttransitrailway.com/libs/${rootProject.mtr_version}/MTR-fabric-${minecraft_version}-${rootProject.mtr_version}-dev-shadow.jar"
-			dest "checkouts/mtr-fabric.jar"
-			overwrite true
-		}
-
-		download {
-			src "https://www.minecrafttransitrailway.com/libs/${rootProject.mtr_version}/MTR-forge-${minecraft_version}-${rootProject.mtr_version}-dev-shadow.jar"
-			dest "checkouts/mtr-forge.jar"
-			overwrite true
-		}
+		mkdir "checkouts/${minecraft_version}"
+		download { src "${url}mtr-common.jar"; dest "checkouts/${minecraft_version}/mtr-common.jar"; overwrite true }
+		download { src "${url}mtr-fabric.jar"; dest "checkouts/${minecraft_version}/mtr-fabric.jar"; overwrite true }
+		download { src "${url}mtr-forge.jar"; dest "checkouts/${minecraft_version}/mtr-forge.jar"; overwrite true }
+		download { src "${url}files.zip"; dest "checkouts/${minecraft_version}/files.zip"; overwrite true }
 	}
 }
 
 task setupFiles() {
-	download {
-		src "https://github.com/jonafanho/Minecraft-Mappings/archive/refs/heads/1.${minecraft_main_version}${is_1_19_3 ? ".3" : ""}.zip"
-		dest "common/src/main/java/botamochi129/manual_enchance/mappings/files.zip"
-		overwrite true
-	}
+	dependsOn setupLibrary
+	outputs.upToDateWhen { false }
 
-	copy {
-		outputs.upToDateWhen { false }
-		from(zipTree("common/src/main/java/botamochi129/manual_enchance/mappings/files.zip")) { eachFile { file -> file.relativePath = new RelativePath(true, file.relativePath.segments.drop(1) as String[]) } }
-		into "common/src/main/java/botamochi129/manual_enchance/mappings"
-		filter(ReplaceTokens, tokens: ["package": "botamochi129.manual_enchance.mappings; import mtr.mappings.*"])
-	}
+	doLast {
+		def zipFile = file("checkouts/${minecraft_version}/files.zip")
+		String mappingPath = "build/generated/sources/mtr-mappings/botamochi129/manual_enchance/mappings"
 
-	ant.path { ant.fileset(dir: "common/src/main/java/botamochi129/manual_enchance/mappings", includes: "Fabric*.java") }.list().each {
-		ant.move(file: it, todir: "fabric/src/main/java/botamochi129/manual_enchance/mappings")
-	}
+		copy {
+			from(zipTree(zipFile)) {
+				eachFile { file -> file.relativePath = new RelativePath(true, file.relativePath.segments.drop(1) as String[]) }
+			}
+			into "common/${mappingPath}"
+			filter(ReplaceTokens, tokens: ["package": "botamochi129.manual_enchance.mappings; import mtr.mappings.*"])
+		}
 
-	ant.path { ant.fileset(dir: "common/src/main/java/botamochi129/manual_enchance/mappings", includes: "Forge*.java") }.list().each {
-		ant.move(file: it, todir: "forge/src/main/java/botamochi129/manual_enchance/mappings")
-	}
+		ant.path { ant.fileset(dir: "common/${mappingPath}", includes: "Fabric*.java") }.list().each {
+			ant.move(file: it, todir: "fabric/${mappingPath}")
+		}
+		ant.path { ant.fileset(dir: "common/${mappingPath}", includes: "Forge*.java") }.list().each {
+			ant.move(file: it, todir: "forge/${mappingPath}")
+		}
 
-	ant.delete(dir: "common/src/main/java/botamochi129/manual_enchance/mappings")
+		copy { from "checkouts/${minecraft_version}/mtr-fabric.jar"; into "fabric/run/mods" }
+		copy { from "checkouts/${minecraft_version}/mtr-forge.jar"; into "forge/run/mods" }
 
-	copy {
-		outputs.upToDateWhen { false }
-		from "checkouts/mtr-fabric.jar"
-		into "fabric/run/mods"
-	}
-
-	copy {
-		outputs.upToDateWhen { false }
-		from "checkouts/mtr-forge.jar"
-		into "forge/run/mods"
-	}
-
-	copy {
-		outputs.upToDateWhen { false }
-		from "common/src/main/BuildConfigTemplate.java"
-		into "common/src/main/java/botamochi129/manual_enchance"
-		filter(ReplaceTokens, tokens: ["version": minecraft_version + "-" + rootProject.mod_version])
-		rename "(.+)Template.java", "\$1.java"
+		copy {
+			from "common/src/main/BuildConfigTemplate.java"
+			into "common/src/main/java/botamochi129/manual_enchance"
+			filter(ReplaceTokens, tokens: ["version": minecraft_version + "-" + rootProject.mod_version])
+			rename "(.+)Template.java", "\$1.java"
+		}
 	}
 }
 
 allprojects {
 	apply plugin: "architectury-plugin"
-
 	version = minecraft_version + "-" + project.mod_version
 	group = project.maven_group
 
@@ -126,48 +120,40 @@ allprojects {
 		maven { url = "https://jitpack.io/" }
 		maven { url = "https://maven.terraformersmc.com/" }
 		maven { url = "https://maven.parchmentmc.org/" }
+		maven { url = "https://maven.shedaniel.me" }
 	}
 
 	tasks.withType(JavaCompile) {
 		options.encoding = "UTF-8"
-
+		options.incremental = true
 		if (minecraft_main_version == 16) {
-			def targetVersion = 8
-			if (JavaVersion.current().isJava9Compatible()) {
-				options.release.set(targetVersion)
-			}
-		} else if (minecraft_main_version == 17) {
-			options.release.set(16)
+			options.release.set(8)
 		} else {
 			options.release.set(17)
 		}
-
-        options.compilerArgs += ['-Xplugin:Manifold', '-AMC_VERSION=' + minecraft_version_int]
+		options.compilerArgs += ['-Xplugin:Manifold', '-AMC_VERSION=' + minecraft_version_int]
 	}
 
 	afterEvaluate {
 		for (def task in it.tasks) {
-			if (task != rootProject.tasks.setupFiles) {
+			// setup系タスク以外が実行される前に setupFiles を確実に走らせる
+			if (task != rootProject.tasks.setupFiles && task != rootProject.tasks.setupLibrary) {
 				task.dependsOn rootProject.tasks.setupFiles
 			}
 		}
 		rootProject.tasks.build.dependsOn rootProject.tasks.setupLibrary
-
 	}
 }
 
+// 最後に static メソッドを配置
 static def getModrinthVersion(loader, minecraftVersion, projectId) {
-	def versionsArray = new JsonSlurper().parse(("https://api.modrinth.com/v2/project/" + projectId + "/version").toURL())
-	for (def versionElement : versionsArray) {
-		if (versionElement["loaders"].contains(loader) && versionElement["game_versions"].contains(minecraftVersion)) {
-			return versionElement["version_number"]
+	try {
+		def versionsArray = new JsonSlurper().parse(("https://api.modrinth.com/v2/project/" + projectId + "/version").toURL())
+		for (def versionElement : versionsArray) {
+			if (versionElement["loaders"].contains(loader) && versionElement["game_versions"].contains(minecraftVersion)) {
+				return versionElement["version_number"]
+			}
 		}
-	}
+	} catch (Exception ignored) {}
 	return ""
-}
-
-static def getParchmentVersion(minecraftVersion) {
-	def url = "https://ldtteam.jfrog.io/artifactory/parchmentmc-internal/org/parchmentmc/data/parchment-" + minecraftVersion + "/maven-metadata.xml"
-	def data = new XmlParser().parse(url)
-	return data.versioning.latest.text()
 }

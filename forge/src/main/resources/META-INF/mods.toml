@@ -1,16 +1,16 @@
 modLoader = "javafml"
 loaderVersion = "[36,)"
 license = "MIT"
-issueTrackerURL="https://github.com/zbx1425/mtr-addon-template/issues"
+issueTrackerURL="https://github.com/botamochi129/Manual-Enchance/issues"
 
 [[mods]]
 modId = "manual_enchance"
 version = "${version}"
 displayName = "Manual-Enchance"
-displayURL = "https://github.com/zbx1425/mtr-addon-template/"
+displayURL = "https://github.com/botamochi129/Manual-Enchance/"
 
 authors = "botamochi129"
-description = "manual_enchance"
+description = "Enhances the manual operation function of MTRmod."
 logoFile = "icon.png"
 
 displayTest = "IGNORE_ALL_VERSION"

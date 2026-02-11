@@ -14,11 +14,11 @@ repositories {
 	}
 }
 
-loom {
-	mixin {
-		defaultRefmapName = "mixins.manual_enchance.refmap.json"
-	}
-}
+//loom {
+//	mixin {
+//		defaultRefmapName = "mixins.manual_enchance.refmap.json"
+//	}
+//}
 
 configurations {
 	common
@@ -33,6 +33,7 @@ dependencies {
 	modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
 	modApi "com.terraformersmc:modmenu:${rootProject.ext.mod_menu_version}"
+	modApi "${rootProject.architectury_id}:architectury-fabric:${rootProject.architectury_version}"
 
 	common(project(path: ":common", configuration: "namedElements")) { transitive false }
 	shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
@@ -50,13 +51,13 @@ shadowJar {
 	exclude "*.bmp"
 
 	configurations = [project.configurations.shadowCommon]
-	classifier "dev-shadow"
+	archiveClassifier.set("dev-shadow")
 }
 
 remapJar {
 	input.set shadowJar.archiveFile
 	dependsOn shadowJar
-	classifier null
+	archiveClassifier.set(null as String)
 }
 
 components.java {

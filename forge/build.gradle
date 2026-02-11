@@ -2,11 +2,11 @@ plugins {
 	id "com.github.johnrengelman.shadow"
 }
 
-loom {
-	forge {
-		mixinConfig "manual_enchance.mixins.json"
-	}
-}
+//loom {
+//	forge {
+//		mixinConfig "manual_enchance.mixins.json"
+//	}
+//}
 
 architectury {
 	platformSetupLoomIde()
@@ -26,7 +26,7 @@ dependencies {
 	modApi "${rootProject.architectury_id}:architectury-forge:${rootProject.architectury_version}"
 
 	common(project(path: ":common", configuration: "namedElements")) { transitive false }
-	shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+	shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive false }
 }
 
 processResources {
@@ -42,13 +42,13 @@ shadowJar {
 	exclude "*.bmp"
 
 	configurations = [project.configurations.shadowCommon]
-	classifier "dev-shadow"
+	archiveClassifier.set("dev-shadow")
 }
 
 remapJar {
 	input.set shadowJar.archiveFile
 	dependsOn shadowJar
-	classifier null
+	archiveClassifier.set(null as String)
 }
 
 components.java {
