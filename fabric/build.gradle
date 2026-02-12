@@ -16,7 +16,7 @@ repositories {
 
 //loom {
 //	mixin {
-//		defaultRefmapName = "mixins.manual_enchance.refmap.json"
+//		defaultRefmapName = "mixins.mtraddontemplate.refmap.json"
 //	}
 //}
 
@@ -69,13 +69,13 @@ components.java {
 task moveFabricBuilds() {
 	doLast {
 		delete fileTree("../build").matching {
-			include "**/Manual-Enchance-fabric*"
+			include "**/MTRAddonTemplate-fabric*"
 		}
 		copy {
 			from "build/libs"
 			into "../build"
 			exclude "*dev-shadow.jar"
-			rename "(.+)", "Manual-Enchance-\$1"
+			rename "(.+)", "MTRAddonTemplate-\$1"
 		}
 	}
 }

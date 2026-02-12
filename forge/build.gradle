@@ -4,7 +4,7 @@ plugins {
 
 //loom {
 //	forge {
-//		mixinConfig "manual_enchance.mixins.json"
+//		mixinConfig "mtraddontemplate.mixins.json"
 //	}
 //}
 
@@ -60,13 +60,13 @@ components.java {
 task moveForgeBuilds() {
 	doLast {
 		delete fileTree("../build").matching {
-			include "**/Manual-Enchance-forge*"
+			include "**/MTRAddonTemplate-forge*"
 		}
 		copy {
 			from "build/libs"
 			into "../build"
 			exclude "*dev-shadow.jar"
-			rename "(.+)", "Manual-Enchance-\$1"
+			rename "(.+)", "MTRAddonTemplate-\$1"
 		}
 	}
 }

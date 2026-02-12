@@ -1,7 +1,6 @@
-package botamochi129.manual_enchance.forge;
+package botamochi129.mtraddontemplate.forge;
 
-import botamochi129.manual_enchance.MainClient;
-import botamochi129.manual_enchance.client.ManualEnchanceClient;
+import botamochi129.mtraddontemplate.MainClient;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -12,7 +11,6 @@ public class ClientProxy {
         @SubscribeEvent
         public static void onClientSetupEvent(FMLClientSetupEvent event) {
             MainClient.init();
-            ManualEnchanceClient.init();
         }
 
     }

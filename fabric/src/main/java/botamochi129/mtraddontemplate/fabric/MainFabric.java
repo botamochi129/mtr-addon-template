@@ -1,6 +1,6 @@
-package botamochi129.manual_enchance.fabric;
+package botamochi129.mtraddontemplate.fabric;
 
-import botamochi129.manual_enchance.Main;
+import botamochi129.mtraddontemplate.Main;
 import net.fabricmc.api.ModInitializer;
 
 public class MainFabric implements ModInitializer {

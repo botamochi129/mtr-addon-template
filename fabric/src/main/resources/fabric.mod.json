@@ -1,32 +1,32 @@
 {
 	"schemaVersion": 1,
-	"id": "manual_enchance",
+	"id": "mtraddontemplate",
 	"version": "${version}",
-	"name": "Manual-Enchance",
-	"description": "Enhances the manual operation function of MTRmod.",
+	"name": "MtrAddonTemplate",
+	"description": "MtrAddonTemplate",
 	"authors": [
 		"botamochi129"
 	],
 	"contact": {
-		"homepage": "https://github.com/botamochi129/Manual-Enchance",
-		"sources": "https://github.com/botamochi129/Manual-Enchance"
+		"homepage": "https://github.com/botamochi129/mtr-addon-template",
+		"sources": "https://github.com/botamochi129/mtr-addon-template"
 	},
 	"license": "MIT",
-	"icon": "assets/manual_enchance/icon.png",
+	"icon": "assets/mtraddontemplate/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"botamochi129.manual_enchance.fabric.MainFabric"
+			"botamochi129.mtraddontemplate.fabric.MainFabric"
 		],
 		"client": [
-			"botamochi129.manual_enchance.fabric.MainFabricClient"
+			"botamochi129.mtraddontemplate.fabric.MainFabricClient"
 		],
 		"modmenu": [
-			"botamochi129.manual_enchance.fabric.ModMenuApiImpl"
+			"botamochi129.mtraddontemplate.fabric.ModMenuApiImpl"
 		]
 	},
 	"mixins": [
-		"manual_enchance.mixins.json"
+		"mtraddontemplate.mixins.json"
 	],
 	"depends": {
 		"fabric": "*",

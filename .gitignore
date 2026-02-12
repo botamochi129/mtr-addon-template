@@ -42,4 +42,4 @@ checkouts
 build.properties
 
 # BuildConfig
-common/src/main/java/botamochi129/manual_enchance/BuildConfig.java
+common/src/main/java/botamochi129/mtraddontemplate/BuildConfig.java

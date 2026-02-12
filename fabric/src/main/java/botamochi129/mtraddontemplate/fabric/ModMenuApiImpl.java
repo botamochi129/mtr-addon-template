@@ -1,4 +1,4 @@
-package botamochi129.manual_enchance.fabric;
+package botamochi129.mtraddontemplate.fabric;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;

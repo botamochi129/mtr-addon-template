@@ -1,8 +1,8 @@
-package botamochi129.manual_enchance.forge;
+package botamochi129.mtraddontemplate.forge;
 
-import botamochi129.manual_enchance.Main;
-import botamochi129.manual_enchance.RegistriesWrapper;
-import botamochi129.manual_enchance.mappings.ForgeUtilities;
+import botamochi129.mtraddontemplate.Main;
+import botamochi129.mtraddontemplate.RegistriesWrapper;
+import botamochi129.mtraddontemplate.mappings.ForgeUtilities;
 import mtr.CreativeModeTabs;
 import mtr.Registry;
 import mtr.RegistryObject;

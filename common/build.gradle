@@ -9,6 +9,6 @@ architectury {
 
 loom {
 	mixin {
-		defaultRefmapName = "mixins.manual_enchance.refmap.json"
+		defaultRefmapName = "mixins.mtraddontemplate.refmap.json"
 	}
 }

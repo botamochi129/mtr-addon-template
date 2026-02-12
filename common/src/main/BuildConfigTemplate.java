@@ -1,4 +1,4 @@
-package botamochi129.manual_enchance;
+package botamochi129.mtraddontemplate;
 
 import java.time.Instant;
 

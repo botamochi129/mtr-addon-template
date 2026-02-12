@@ -1,8 +1,8 @@
-package botamochi129.manual_enchance.fabric;
+package botamochi129.mtraddontemplate.fabric;
 
-import botamochi129.manual_enchance.Main;
-import botamochi129.manual_enchance.RegistriesWrapper;
-import botamochi129.manual_enchance.mappings.FabricRegistryUtilities;
+import botamochi129.mtraddontemplate.Main;
+import botamochi129.mtraddontemplate.RegistriesWrapper;
+import botamochi129.mtraddontemplate.mappings.FabricRegistryUtilities;
 import mtr.CreativeModeTabs;
 import mtr.RegistryObject;
 import mtr.mappings.BlockEntityMapper;
